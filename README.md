@@ -22,7 +22,7 @@ python main.py
 
 ## Dataset
 
-- `x.txt` includes 3900 spectra from 13 classes of coffee beans with different flavor quality, and the details are in this paper.
+- `x.txt` includes 3900 spectra from 13 classes of coffee beans with different flavor quality, and the details are in our paper.
 - `place-x.txt` includes 35200 spectra of coffee beans from 11 places.
 
-The label of `place-x.txt` is `place-y.txt`. The label of `x.txt` is directly written in `main.py`.
+Each spectrum is ranging from 400 to 1000 nm with 224 dimensions. The label of `place-x.txt` is `place-y.txt`. The label of `x.txt` is directly written in `main.py`.
