@@ -6,6 +6,7 @@ from sklearn.model_selection import KFold
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.svm import SVC
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.decomposition import PCA
 from xgboost import XGBClassifier
 import seaborn
 seaborn.set(style='whitegrid',font_scale=1.5)
@@ -16,7 +17,36 @@ REGRESSOR = 'LGB'
 x = np.loadtxt('x.txt')
 labels = ['F1','F2','F3','F4','F5','F6','F7','F8','P1','P2','P3','P4','P5']
 
+def plot(x,y,name):
+    plt.figure()
+    i = 0
+    t = np.linspace(397,1023,224)
+    labeltxt = sorted(set(y),key=lambda x:x)
+    palet = seaborn.color_palette("husl", n_colors=len(set(y)))
+    for g in labeltxt:
+        intensity = x[np.where(y==g)].mean(axis=0)
+        intensity -= min(intensity)
+        intensity /= max(intensity)
+        plt.plot(t,intensity-i,label=g,color=palet[i])
+        i += 1
+
+    plt.yticks([])
+    plt.xlabel('Wavelength(nm)')
+    plt.ylabel('Normalized intensity (a.u.)')
+    plt.xlim(397,1023)
+    plt.legend(bbox_to_anchor=(1.001,1))
+    plt.tight_layout()
+    plt.savefig('{}-spec.jpg'.format(name))
+    pca = PCA(n_components=2)
+    xx = pca.fit_transform(x)
+    plt.figure()
+    seaborn.scatterplot(x=xx[:,0],y=xx[:,1],hue=y,palette=palet)
+    plt.legend(bbox_to_anchor=(1.001,1))
+    plt.tight_layout()
+    plt.savefig('{}-scatter.jpg'.format(name))
+
 def kfo(x,y,name):
+    plot(x,y,name)
     kf = KFold(n_splits=2,shuffle=True)
     if name == 'Qgrade':
         pred = np.zeros(len(y))
@@ -50,7 +80,7 @@ def kfo(x,y,name):
     if name == 'Label': 
         labeltxt = labels
     else:
-        labeltxt = list(set(y))
+        labeltxt = sorted(set(y),key=lambda x:x)
     
     confusion = confusion_matrix(y,pred,labels=labeltxt)
     plt.figure(figsize=(8,6))
@@ -61,14 +91,15 @@ def kfo(x,y,name):
     plt.ylabel('True')
     acc = accuracy_score(y,pred)
     plt.title('%s, accuracy=%.3f' % (name,acc))
-    plt.show()
+    plt.tight_layout()
+    plt.savefig('{}-conf.jpg'.format(name))
     if name == 'Qgrade':
         r2 = r2_score(y,predr)
         mae = mean_absolute_error(y,predr)
         plt.figure()
         plt.title('%s, MAE=%.3f, r2=%.3f' % (name,mae,r2))
-        seaborn.boxplot(y,predr,color='cyan',fliersize=0)
-        plt.show()
+        seaborn.boxplot(x=y,y=predr,color='cyan',fliersize=0)
+        plt.savefig('{}-reg.jpg'.format(name))
 
 score = [79,79,79,78,78,78,77,77,83,82,81,81,80]
 y = []
