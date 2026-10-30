@@ -40,7 +40,7 @@ def plot(x,y,name):
     pca = PCA(n_components=2)
     xx = pca.fit_transform(x)
     plt.figure()
-    seaborn.scatterplot(x=xx[:,0],y=xx[:,1],hue=y,palette=palet)
+    seaborn.scatterplot(x=xx[:,0],y=xx[:,1],hue=y,hue_order=labeltxt,palette=palet)
     plt.legend(bbox_to_anchor=(1.001,1))
     plt.tight_layout()
     plt.savefig('{}-scatter.jpg'.format(name))
